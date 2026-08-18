@@ -1,0 +1,8 @@
+node_modules/
+dist-tests/
+*.bak.*
+*.disabled
+sample_report.html
+audit_report.html
+.DS_Store
+Thumbs.db

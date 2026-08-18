@@ -1,0 +1,41 @@
+{
+  "name": "claude-context-auditor",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Stop wasting $200/mo on idle MCP servers and context bloat in Claude Code & Claude Desktop",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "claude-context-auditor": "bin/cli.js",
+    "claude-doctor": "bin/cli.js",
+    "context-auditor": "bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:test": "tsc -p tsconfig.test.json",
+    "watch": "tsc -w",
+    "start": "node bin/cli.js",
+    "test": "npm run build:test && node --test dist-tests/tests/*.test.js",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "model-context-protocol",
+    "mcp",
+    "context-window",
+    "token-optimizer",
+    "ai-agent",
+    "anthropic",
+    "cost-optimizer"
+  ],
+  "author": "Antigravity Builder",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}
