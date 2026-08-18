@@ -68,11 +68,8 @@ export class ConfigParser {
    */
   private static extractMCPServers(rawConfig: Record<string, unknown>, paths: DiscoveredPaths): MCPServerInfo[] {
     const servers: MCPServerInfo[] = [];
-
-    // Look in rawConfig.mcpServers or rawConfig.mcp_servers
     const mcpObj = (rawConfig.mcpServers || rawConfig.mcp_servers || {}) as Record<string, any>;
 
-    // Also merge from desktop config if separate
     if (paths.desktopConfig && fs.existsSync(paths.desktopConfig)) {
       try {
         const desktopContent = fs.readFileSync(paths.desktopConfig, 'utf-8');
@@ -81,11 +78,10 @@ export class ConfigParser {
           Object.assign(mcpObj, desktopJson.mcpServers);
         }
       } catch {
-        // ignore parse error
+        // ignore
       }
     }
 
-    // Also merge from cursor config
     if (paths.cursorConfig && fs.existsSync(paths.cursorConfig)) {
       try {
         const cursorContent = fs.readFileSync(paths.cursorConfig, 'utf-8');
@@ -94,7 +90,7 @@ export class ConfigParser {
           Object.assign(mcpObj, cursorJson.mcpServers);
         }
       } catch {
-        // ignore parse error
+        // ignore
       }
     }
 
@@ -106,7 +102,6 @@ export class ConfigParser {
       let tokenCost = 0;
       const toolsList: { name: string; description?: string; tokens: number }[] = [];
 
-      // If mock/declared tools are listed
       if (Array.isArray(config.tools)) {
         toolCount = config.tools.length;
         for (const t of config.tools) {
@@ -119,9 +114,6 @@ export class ConfigParser {
           });
         }
       } else {
-        // Estimate based on standard MCP server signatures or configuration size
-        // Standard MCP server tools average ~650 tokens per tool schema
-        // Common defaults: github ~45 tools (28k tokens), postgres ~12 tools (8k tokens), etc.
         const serverEstimates: Record<string, { tools: number; tokens: number }> = {
           github: { tools: 48, tokens: 32500 },
           filesystem: { tools: 11, tokens: 6200 },
@@ -144,7 +136,6 @@ export class ConfigParser {
           toolCount = serverEstimates[matched].tools;
           tokenCost = serverEstimates[matched].tokens;
         } else {
-          // Dynamic estimation based on command, args and config volume
           const configTokens = TokenEngine.countObjectTokens(config);
           toolCount = Math.max(5, Math.ceil(configTokens / 40));
           tokenCost = Math.max(2500, toolCount * 580);
@@ -181,9 +172,9 @@ export class ConfigParser {
    */
   private static extractSkills(rawConfig: Record<string, unknown>, paths: DiscoveredPaths): InjectedSkillInfo[] {
     const skills: InjectedSkillInfo[] = [];
-    const skillNameMap = new Map<string, string>(); // name -> path/source
+    const skillNameMap = new Map<string, string>();
 
-    // 1. Injected from rawConfig.skills or anthropic-skills
+    // 1. Injected from rawConfig.skills
     const configSkills = (rawConfig.skills || rawConfig.injected_skills || []) as any[];
     if (Array.isArray(configSkills)) {
       for (const item of configSkills) {
@@ -203,22 +194,23 @@ export class ConfigParser {
       }
     }
 
-    // 2. Scan Global Skills Directory
-    if (paths.globalSkillsDir && fs.existsSync(paths.globalSkillsDir)) {
-      this.scanSkillDirectory(paths.globalSkillsDir, 'global', skills, skillNameMap);
+    // 2. Scan All Global Skills Directories
+    for (const gDir of paths.globalSkillsDirs) {
+      if (fs.existsSync(gDir)) {
+        this.scanSkillDirectory(gDir, 'global', skills, skillNameMap);
+      }
     }
 
-    // 3. Scan Workspace Skills Directory
-    if (paths.workspaceSkillsDir && fs.existsSync(paths.workspaceSkillsDir)) {
-      this.scanSkillDirectory(paths.workspaceSkillsDir, 'workspace', skills, skillNameMap);
+    // 3. Scan All Workspace Skills Directories
+    for (const wDir of paths.workspaceSkillsDirs) {
+      if (fs.existsSync(wDir)) {
+        this.scanSkillDirectory(wDir, 'workspace', skills, skillNameMap);
+      }
     }
 
     return skills;
   }
 
-  /**
-   * Helper to scan skill directories
-   */
   private static scanSkillDirectory(
     dirPath: string,
     source: 'global' | 'workspace',
@@ -274,9 +266,6 @@ export class ConfigParser {
     }
   }
 
-  /**
-   * Scan Hooks Directory
-   */
   private static extractHooks(hooksDir?: string): HookInfo[] {
     const hooks: HookInfo[] = [];
     if (!hooksDir || !fs.existsSync(hooksDir)) return hooks;
@@ -311,9 +300,6 @@ export class ConfigParser {
     return hooks;
   }
 
-  /**
-   * Scan CLAUDE.md and rule files
-   */
   private static extractRules(ruleFiles: string[]): RuleFileDocInfo[] {
     const rules: RuleFileDocInfo[] = [];
 

@@ -21,17 +21,8 @@ export declare class ConfigParser {
      * Extract skills and detect duplication between global, workspace, and remote
      */
     private static extractSkills;
-    /**
-     * Helper to scan skill directories
-     */
     private static scanSkillDirectory;
-    /**
-     * Scan Hooks Directory
-     */
     private static extractHooks;
-    /**
-     * Scan CLAUDE.md and rule files
-     */
     private static extractRules;
     private static normalizeSkillName;
 }

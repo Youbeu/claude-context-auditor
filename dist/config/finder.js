@@ -3,11 +3,13 @@ import path from 'path';
 import os from 'os';
 export class ConfigFinder {
     /**
-     * Search and discover all active Claude and MCP configuration paths
+     * Search and discover all active Claude, Gemini, Antigravity, and MCP configuration paths
      */
     static discover(customConfigPath, cwd = process.cwd()) {
         const home = os.homedir();
         const result = {
+            globalSkillsDirs: [],
+            workspaceSkillsDirs: [],
             claudeRuleFiles: [],
         };
         // 1. Explicit Custom Path
@@ -55,15 +57,27 @@ export class ConfigFinder {
         else if (fs.existsSync(globalCursorMcp)) {
             result.cursorConfig = globalCursorMcp;
         }
-        // 6. Global Skills Directory (~/.claude/skills/)
-        const globalSkills = path.join(home, '.claude', 'skills');
-        if (fs.existsSync(globalSkills)) {
-            result.globalSkillsDir = globalSkills;
+        // 6. Global Skills Directories (~/.claude/skills/, ~/.gemini/config/skills/, builtin)
+        const candidateGlobalSkills = [
+            path.join(home, '.claude', 'skills'),
+            path.join(home, '.gemini', 'config', 'skills'),
+            path.join(home, '.gemini', 'antigravity-ide', 'builtin', 'skills'),
+        ];
+        for (const dir of candidateGlobalSkills) {
+            if (fs.existsSync(dir)) {
+                result.globalSkillsDirs.push(dir);
+            }
         }
-        // 7. Workspace Skills Directory (./.claude/skills/)
-        const workspaceSkills = path.join(cwd, '.claude', 'skills');
-        if (fs.existsSync(workspaceSkills)) {
-            result.workspaceSkillsDir = workspaceSkills;
+        // 7. Workspace Skills Directories (./.claude/skills/, ./.agents/skills/)
+        const candidateWorkspaceSkills = [
+            path.join(cwd, '.claude', 'skills'),
+            path.join(cwd, '.agents', 'skills'),
+            path.join(cwd, 'skills'),
+        ];
+        for (const dir of candidateWorkspaceSkills) {
+            if (fs.existsSync(dir)) {
+                result.workspaceSkillsDirs.push(dir);
+            }
         }
         // 8. Hooks Directory (~/.claude/hooks/)
         const hooksPath = path.join(home, '.claude', 'hooks');
@@ -71,15 +85,18 @@ export class ConfigFinder {
             result.hooksDir = hooksPath;
         }
         // 9. CLAUDE.md & Rules
-        const localClaudeMd = path.join(cwd, 'CLAUDE.md');
-        const globalClaudeMd = path.join(home, '.claude', 'CLAUDE.md');
-        const localCursorRules = path.join(cwd, '.cursorrules');
-        if (fs.existsSync(localClaudeMd))
-            result.claudeRuleFiles.push(localClaudeMd);
-        if (fs.existsSync(globalClaudeMd))
-            result.claudeRuleFiles.push(globalClaudeMd);
-        if (fs.existsSync(localCursorRules))
-            result.claudeRuleFiles.push(localCursorRules);
+        const candidateRules = [
+            path.join(cwd, 'CLAUDE.md'),
+            path.join(home, '.claude', 'CLAUDE.md'),
+            path.join(cwd, '.cursorrules'),
+            path.join(cwd, 'GEMINI.md'),
+            path.join(cwd, 'AGENTS.md'),
+        ];
+        for (const rule of candidateRules) {
+            if (fs.existsSync(rule)) {
+                result.claudeRuleFiles.push(rule);
+            }
+        }
         return result;
     }
 }
