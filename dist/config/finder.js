@@ -5,7 +5,7 @@ export class ConfigFinder {
     /**
      * Search and discover all active Claude, Gemini, Antigravity, and MCP configuration paths
      */
-    static discover(customConfigPath, cwd = process.cwd()) {
+    static discover(customConfigPath, cwd = process.cwd(), options = { includeGlobalSkills: true, includeWorkspaceSkills: true }) {
         const home = os.homedir();
         const result = {
             globalSkillsDirs: [],
@@ -58,25 +58,29 @@ export class ConfigFinder {
             result.cursorConfig = globalCursorMcp;
         }
         // 6. Global Skills Directories (~/.claude/skills/, ~/.gemini/config/skills/, builtin)
-        const candidateGlobalSkills = [
-            path.join(home, '.claude', 'skills'),
-            path.join(home, '.gemini', 'config', 'skills'),
-            path.join(home, '.gemini', 'antigravity-ide', 'builtin', 'skills'),
-        ];
-        for (const dir of candidateGlobalSkills) {
-            if (fs.existsSync(dir)) {
-                result.globalSkillsDirs.push(dir);
+        if (options.includeGlobalSkills !== false) {
+            const candidateGlobalSkills = [
+                path.join(home, '.claude', 'skills'),
+                path.join(home, '.gemini', 'config', 'skills'),
+                path.join(home, '.gemini', 'antigravity-ide', 'builtin', 'skills'),
+            ];
+            for (const dir of candidateGlobalSkills) {
+                if (fs.existsSync(dir)) {
+                    result.globalSkillsDirs.push(dir);
+                }
             }
         }
         // 7. Workspace Skills Directories (./.claude/skills/, ./.agents/skills/)
-        const candidateWorkspaceSkills = [
-            path.join(cwd, '.claude', 'skills'),
-            path.join(cwd, '.agents', 'skills'),
-            path.join(cwd, 'skills'),
-        ];
-        for (const dir of candidateWorkspaceSkills) {
-            if (fs.existsSync(dir)) {
-                result.workspaceSkillsDirs.push(dir);
+        if (options.includeWorkspaceSkills !== false) {
+            const candidateWorkspaceSkills = [
+                path.join(cwd, '.claude', 'skills'),
+                path.join(cwd, '.agents', 'skills'),
+                path.join(cwd, 'skills'),
+            ];
+            for (const dir of candidateWorkspaceSkills) {
+                if (fs.existsSync(dir)) {
+                    result.workspaceSkillsDirs.push(dir);
+                }
             }
         }
         // 8. Hooks Directory (~/.claude/hooks/)
