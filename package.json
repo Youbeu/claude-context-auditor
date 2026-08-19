@@ -18,6 +18,14 @@
     "test": "npm run build:test && node --test dist-tests/tests/*.test.js",
     "prepack": "npm run build"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Youbeu/claude-context-auditor.git"
+  },
+  "homepage": "https://github.com/Youbeu/claude-context-auditor#readme",
+  "bugs": {
+    "url": "https://github.com/Youbeu/claude-context-auditor/issues"
+  },
   "keywords": [
     "claude",
     "claude-code",
@@ -29,7 +37,7 @@
     "anthropic",
     "cost-optimizer"
   ],
-  "author": "Antigravity Builder",
+  "author": "Youbeu (https://github.com/Youbeu)",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"

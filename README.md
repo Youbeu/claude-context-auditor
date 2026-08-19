@@ -6,8 +6,9 @@
 *Stop wasting 60,000+ tokens ($200/month) on idle MCP schemas and silent skill bloat.*
 
 [![npm version](https://img.shields.io/npm/v/claude-context-auditor.svg?style=flat-square&color=3b82f6)](https://www.npmjs.com/package/claude-context-auditor)
+[![GitHub Stars](https://img.shields.io/github/stars/Youbeu/claude-context-auditor.svg?style=flat-square)](https://github.com/Youbeu/claude-context-auditor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/Youbeu/claude-context-auditor/pulls)
 
 </div>
 
@@ -146,8 +147,8 @@ const fixResult = ConfigFixer.applyFix(audit, {
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
-Feel free to check [issues page](https://github.com).
+Feel free to check [issues page](https://github.com/Youbeu/claude-context-auditor/issues).
 
 ## 📄 License
 
-MIT © Antigravity Builder
+MIT © [Youbeu](https://github.com/Youbeu)
