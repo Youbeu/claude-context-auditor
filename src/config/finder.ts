@@ -2,6 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
+export interface DiscoverOptions {
+  includeGlobalSkills?: boolean;
+  includeWorkspaceSkills?: boolean;
+}
+
 export interface DiscoveredPaths {
   primaryConfig?: string;
   desktopConfig?: string;
@@ -17,7 +22,11 @@ export class ConfigFinder {
   /**
    * Search and discover all active Claude, Gemini, Antigravity, and MCP configuration paths
    */
-  static discover(customConfigPath?: string, cwd: string = process.cwd()): DiscoveredPaths {
+  static discover(
+    customConfigPath?: string,
+    cwd: string = process.cwd(),
+    options: DiscoverOptions = { includeGlobalSkills: true, includeWorkspaceSkills: true }
+  ): DiscoveredPaths {
     const home = os.homedir();
     const result: DiscoveredPaths = {
       globalSkillsDirs: [],
@@ -74,28 +83,32 @@ export class ConfigFinder {
     }
 
     // 6. Global Skills Directories (~/.claude/skills/, ~/.gemini/config/skills/, builtin)
-    const candidateGlobalSkills = [
-      path.join(home, '.claude', 'skills'),
-      path.join(home, '.gemini', 'config', 'skills'),
-      path.join(home, '.gemini', 'antigravity-ide', 'builtin', 'skills'),
-    ];
+    if (options.includeGlobalSkills !== false) {
+      const candidateGlobalSkills = [
+        path.join(home, '.claude', 'skills'),
+        path.join(home, '.gemini', 'config', 'skills'),
+        path.join(home, '.gemini', 'antigravity-ide', 'builtin', 'skills'),
+      ];
 
-    for (const dir of candidateGlobalSkills) {
-      if (fs.existsSync(dir)) {
-        result.globalSkillsDirs.push(dir);
+      for (const dir of candidateGlobalSkills) {
+        if (fs.existsSync(dir)) {
+          result.globalSkillsDirs.push(dir);
+        }
       }
     }
 
     // 7. Workspace Skills Directories (./.claude/skills/, ./.agents/skills/)
-    const candidateWorkspaceSkills = [
-      path.join(cwd, '.claude', 'skills'),
-      path.join(cwd, '.agents', 'skills'),
-      path.join(cwd, 'skills'),
-    ];
+    if (options.includeWorkspaceSkills !== false) {
+      const candidateWorkspaceSkills = [
+        path.join(cwd, '.claude', 'skills'),
+        path.join(cwd, '.agents', 'skills'),
+        path.join(cwd, 'skills'),
+      ];
 
-    for (const dir of candidateWorkspaceSkills) {
-      if (fs.existsSync(dir)) {
-        result.workspaceSkillsDirs.push(dir);
+      for (const dir of candidateWorkspaceSkills) {
+        if (fs.existsSync(dir)) {
+          result.workspaceSkillsDirs.push(dir);
+        }
       }
     }
 

@@ -7,7 +7,7 @@ import { AnomalyDetector } from '../src/engine/detector.js';
 
 test('AnomalyDetector should identify heavy MCP overhead and skill duplicates', () => {
   const bloatedFixture = path.join(process.cwd(), 'tests', 'fixtures', 'bloated_claude.json');
-  const paths = ConfigFinder.discover(bloatedFixture);
+  const paths = ConfigFinder.discover(bloatedFixture, process.cwd(), { includeGlobalSkills: false });
   const bundle = ConfigParser.parseAll(paths);
   const audit = AnomalyDetector.analyze(bundle);
 
@@ -31,7 +31,7 @@ test('AnomalyDetector should identify heavy MCP overhead and skill duplicates', 
 
 test('AnomalyDetector should recognize clean configuration', () => {
   const cleanFixture = path.join(process.cwd(), 'tests', 'fixtures', 'clean_claude.json');
-  const paths = ConfigFinder.discover(cleanFixture);
+  const paths = ConfigFinder.discover(cleanFixture, process.cwd(), { includeGlobalSkills: false });
   const bundle = ConfigParser.parseAll(paths);
   const audit = AnomalyDetector.analyze(bundle);
 
